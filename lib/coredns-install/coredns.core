@@ -1,0 +1,12 @@
+.:53 {
+     kubernetes coredns.local {
+                resyncperiod 60s
+                endpoint https://192.168.100.100:8443
+                tls /var/lib/boot2docker/opt/coredns/apiserver.crt /var/lib/boot2docker/opt/coredns/apiserver.key /var/lib/boot2docker/opt/coredns/ca.crt
+                template {service}.{namespace}.{type}.{zone}
+     }
+     proxy . 8.8.8.8:53 8.8.4.4:53
+     log stdout {
+         class error
+     }   
+}
