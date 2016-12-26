@@ -33,6 +33,9 @@ case $1 in
     network)
         network
         ;;
+    update)
+        update
+        ;;
     *)
         minikube $@
         ;;
