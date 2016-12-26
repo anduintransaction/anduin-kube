@@ -4,18 +4,18 @@ here=`cd $(dirname $BASH_SOURCE); pwd`
 root=$here/..
 . $root/lib/common.sh
 
-function installAnduinMinikubeDeploy {
-    if which anduin-minikube-deploy > /dev/null 2>&1; then
-        version=`anduin-minikube-deploy version`
-        if [ "$version" == "$ANDUIN_MINIKUBE_DEPLOY_VERSION" ]; then
+function installAnduinKubeDeploy {
+    if which anduin-kube-deploy > /dev/null 2>&1; then
+        version=`anduin-kube-deploy version`
+        if [ "$version" == "$ANDUIN_KUBE_DEPLOY_VERSION" ]; then
             return
         fi
     fi
-    wget https://github.com/anduintransaction/anduin-minikube-deploy/releases/download/$ANDUIN_MINIKUBE_DEPLOY_VERSION/anduin-minikube-deploy-$ANDUIN_MINIKUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        tar xzf anduin-minikube-deploy-$ANDUIN_MINIKUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        rm anduin-minikube-deploy-$ANDUIN_MINIKUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        copyToUsrLocalBin anduin-minikube-deploy && \
-        rm anduin-minikube-deploy
+    wget https://github.com/anduintransaction/anduin-kube-deploy/releases/download/$ANDUIN_KUBE_DEPLOY_VERSION/anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
+        tar xzf anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
+        rm anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
+        copyToUsrLocalBin anduin-kube-deploy && \
+        rm anduin-kube-deploy
 }
 
 function installDockerCommandline {
@@ -37,4 +37,4 @@ copyToUsrLocalBin $root/bin/anduin-kube && \
     rm -rf $HOME/.anduin-kube/lib && \
     cp -r $root/lib $HOME/.anduin-kube/ && \
     installDockerCommandline && \
-    installAnduinMinikubeDeploy
+    installAnduinKubeDeploy
