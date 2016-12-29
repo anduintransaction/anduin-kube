@@ -16,7 +16,10 @@ function startMinikube {
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
-             --host-only-cidr="${MINIKUBE_CIDR}/24"
+             --host-only-cidr="${MINIKUBE_CIDR}/24" && \
+        minikube stop && \
+        VBoxManage modifyvm minikube --natdnshostresolver1 on && \
+        minikube start
 }
 
 function installInitService {
