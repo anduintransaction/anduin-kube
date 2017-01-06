@@ -35,8 +35,8 @@ function installCoreDNS {
         rm -f coredns_003_linux_x86_64.tgz && \
         wget https://github.com/miekg/coredns/releases/download/v003/coredns_003_linux_x86_64.tgz && \
         tar xzf coredns_003_linux_x86_64.tgz && \
-        rm -f coredns_003_linux_x86_64.tgz && \
         copyFileToMinikube coredns /home/docker/coredns-install && \
+        rm -f coredns coredns_003_linux_x86_64.tgz && \
         runCommandOnMinikube /home/docker/coredns-install/install.sh
 }
 
