@@ -10,6 +10,8 @@ export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.5.1
 export DOCKER_VERSION=1.12.4
 export ANDUIN_KUBE_DEPLOY_VERSION=0.5.3
+export EXTRA_NAT_NETWORK_NAME=minikube
+export EXTRA_NAT_NETWORK_NET=10.0.72.0/24
 
 function getCurrentUser {
     whoami
