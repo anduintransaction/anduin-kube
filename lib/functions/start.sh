@@ -26,6 +26,7 @@ function startMinikube {
         minikube stop && \
         VBoxManage modifyvm minikube --nic3 natnetwork && \
         VBoxManage modifyvm minikube --nat-network3 minikube && \
+        VBoxManage modifyvm minikube --nictype3 82540EM && \
         minikube start
 }
 
