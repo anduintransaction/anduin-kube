@@ -16,10 +16,8 @@ function startMinikube {
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
-             --host-only-cidr="${MINIKUBE_CIDR}/24" && \
-        minikube stop && \
-        VBoxManage modifyvm minikube --natdnshostresolver1 on && \
-        minikube start
+             --iso-url=https://storage.googleapis.com/minikube/iso/minikube-v1.0.1.iso \
+             --host-only-cidr="${MINIKUBE_CIDR}/24"
 }
 
 function installInitService {
@@ -34,12 +32,17 @@ function installCoreDNS {
         copyFileToMinikube $HOME/.minikube/ca.crt /home/docker/coredns-install && \
         copyFileToMinikube $HOME/.minikube/apiserver.crt /home/docker/coredns-install && \
         copyFileToMinikube $HOME/.minikube/apiserver.key /home/docker/coredns-install && \
+        rm -f coredns_003_linux_x86_64.tgz && \
+        wget https://github.com/miekg/coredns/releases/download/v003/coredns_003_linux_x86_64.tgz && \
+        tar xzf coredns_003_linux_x86_64.tgz && \
+        rm -f coredns_003_linux_x86_64.tgz && \
+        copyFileToMinikube coredns /home/docker/coredns-install && \
         runCommandOnMinikube /home/docker/coredns-install/install.sh
 }
 
-function runBootLocal {
-    echo "Running boot local services"
-    runCommandOnMinikube sudo /var/lib/boot2docker/bootlocal.sh
+function runInitService {
+    echo "Running init services"
+    runCommandOnMinikube sudo /mnt/sda1/var/lib/init/init.sh
 }
 
 function waitForKubernetes {
@@ -69,6 +72,7 @@ function start {
             deleteVBoxNetwork $MINIKUBE_CIDR && \
                 createNetwork && \
                 minikube start && \
+                runInitService && \
                 setupKubernetesNetworking && \
                 waitForKubernetes
             ;;
@@ -78,7 +82,7 @@ function start {
                 startMinikube && \
                 installInitService && \
                 installCoreDNS && \
-                runBootLocal && \
+                runInitService && \
                 setupKubernetesNetworking && \
                 waitForKubernetes
             ;;

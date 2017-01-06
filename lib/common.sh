@@ -9,7 +9,7 @@ export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.5.1
 export DOCKER_VERSION=1.12.4
-export ANDUIN_KUBE_DEPLOY_VERSION=0.5.2
+export ANDUIN_KUBE_DEPLOY_VERSION=0.5.3
 
 function getCurrentUser {
     whoami

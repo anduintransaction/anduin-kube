@@ -20,7 +20,7 @@ function installAnduinKubeDeploy {
 
 function installDockerCommandline {
     if which docker > /dev/null 2>&1; then
-        version=`docker version 2>/dev/null | grep Version | head -1 | awk '{print $2}' | sed 's/\s*//g'`
+        version=`docker version --format '{{.Client.Version}}' 2>/dev/null`
         if [ "$version" == "$DOCKER_VERSION" ]; then
             return
         fi

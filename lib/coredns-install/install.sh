@@ -1,20 +1,15 @@
 #!/bin/sh
 
-coreDNSRoot=/var/lib/boot2docker/opt/coredns
+coreDNSRoot=/mnt/sda1/var/lib/coredns
 
 installCoreDNS() {
     if [ -f "$coreDNSRoot/coredns" ]; then
         return
     fi
-    echo "Installing coreDNS"
     sudo mkdir -p $coreDNSRoot && \
-        rm -f coredns_003_linux_x86_64.tgz && \
-        wget https://github.com/miekg/coredns/releases/download/v003/coredns_003_linux_x86_64.tgz && \
-        tar xzf coredns_003_linux_x86_64.tgz && \
-        sudo mv coredns $coreDNSRoot/coredns && \
+        sudo mv /home/docker/coredns-install/coredns $coreDNSRoot/coredns && \
         sudo chmod 755 $coreDNSRoot/coredns && \
-        sudo chown root:root $coreDNSRoot/coredns && \
-        rm -f coredns_003_linux_x86_64.tgz
+        sudo chown root:root $coreDNSRoot/coredns
 }
 
 installCoreDNSConfig() {
@@ -25,7 +20,7 @@ installCoreDNSConfig() {
 }
 
 installCoreDNSService() {
-    sudo cp /home/docker/coredns-install/coredns-boot.sh /var/lib/boot2docker/init.d/
+    sudo cp /home/docker/coredns-install/coredns.sh /mnt/sda1/var/init.d/
 }
 
 installCoreDNS && installCoreDNSConfig && installCoreDNSService

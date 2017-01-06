@@ -1,8 +1,8 @@
 #!/bin/sh
 
 PIDFILE=/var/run/coredns.pid
-COREDNS=/var/lib/boot2docker/opt/coredns/coredns
-COREDNS_CONFIG=/var/lib/boot2docker/opt/coredns/coredns.core
+COREDNS=/mnt/sda1/var/lib/coredns/coredns
+COREDNS_CONFIG=/mnt/sda1/var/lib/coredns/coredns.core
 
 checkPid() {
     if [ ! -f $PIDFILE ]; then
@@ -21,6 +21,7 @@ start() {
         return
     fi
     echo "Starting coredns"
+    systemctl stop systemd-resolved
     nohup $COREDNS -conf $COREDNS_CONFIG > /var/log/coredns.log 2>&1 &
     echo $! > $PIDFILE
     echo "Success"

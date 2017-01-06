@@ -1,4 +1,5 @@
 #!/bin/sh
 
-sudo mkdir -p /var/lib/boot2docker/init.d && \
-    sudo cp /home/docker/init-service-install/bootlocal.sh /var/lib/boot2docker/
+sudo mkdir -p /mnt/sda1/var/init.d && \
+    sudo mkdir -p /mnt/sda1/var/lib/init && \
+    sudo cp /home/docker/init-service-install/init.sh /mnt/sda1/var/lib/init/init.sh

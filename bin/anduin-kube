@@ -24,6 +24,9 @@ case $1 in
     start)
         start
         ;;
+    restart)
+        minikube stop && start
+        ;;
     delete)
         delete
         ;;
