@@ -4,18 +4,18 @@ here=`cd $(dirname $BASH_SOURCE); pwd`
 root=$here/..
 . $root/lib/common.sh
 
-function installAnduinKubeDeploy {
-    if which anduin-kube-deploy > /dev/null 2>&1; then
-        version=`anduin-kube-deploy version`
-        if [ "$version" == "$ANDUIN_KUBE_DEPLOY_VERSION" ]; then
+function installImladris {
+    if which imladris > /dev/null 2>&1; then
+        version=`imladris version`
+        if [ "$version" == "$IMLADRIS_VERSION" ]; then
             return
         fi
     fi
-    wget https://github.com/anduintransaction/anduin-kube-deploy/releases/download/$ANDUIN_KUBE_DEPLOY_VERSION/anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        tar xzf anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        rm anduin-kube-deploy-$ANDUIN_KUBE_DEPLOY_VERSION-darwin-amd64.tar.gz && \
-        copyToUsrLocalBin anduin-kube-deploy && \
-        rm anduin-kube-deploy
+    wget https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
+        tar xzf imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
+        rm imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
+        copyToUsrLocalBin imladris && \
+        rm imladris
 }
 
 function installDockerCommandline {
@@ -37,4 +37,4 @@ copyToUsrLocalBin $root/bin/anduin-kube && \
     rm -rf $HOME/.anduin-kube/lib && \
     cp -r $root/lib $HOME/.anduin-kube/ && \
     installDockerCommandline && \
-    installAnduinKubeDeploy
+    installImladris
