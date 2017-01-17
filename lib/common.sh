@@ -9,7 +9,7 @@ export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.5.1
 export DOCKER_VERSION=1.12.4
-export IMLADRIS_VERSION=0.5.9
+export IMLADRIS_VERSION=0.6.0
 export EXTRA_NAT_NETWORK_NAME=minikube
 export EXTRA_NAT_NETWORK_NET=10.0.72.0/24
 
@@ -110,6 +110,27 @@ function modifyRoute {
         return
     fi
     sudo route -n add 10.0.0.0/24 $MINIKUBE_IP
+}
+
+function cleanupDNS {
+    networksetup -listallnetworkservices | grep -v '\*' | while read line; do
+        currentNS=`networksetup -getdnsservers "$line"`
+        if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]]; then
+            currentNS=`echo $currentNS | sed 's/'$MINIKUBE_IP'//g' | sed 's/\s*//'`
+            sudo networksetup -setdnsservers "$line" $currentNS
+        fi
+        currentSearch=`networksetup -getsearchdomains "$line"`
+        if [[ $currentSearch != There* ]] && [[ $currentSearch == *svc.coredns.local* ]]; then
+            currentSearch=`echo $currentSearch | sed 's/svc.coredns.local//g' | sed 's/\s*//'`
+            sudo networksetup -setsearchdomains "$line" "$currentSearch"
+        fi
+    done
+}
+
+function cleanupRoute {
+    if netstat -nr | grep '10/24'; then
+        sudo route -n delete 10.0.0.0/24
+    fi
 }
 
 function setupKubernetesNetworking {
