@@ -1,12 +1,23 @@
-.:53 {
+coredns.local:53 {
      kubernetes coredns.local {
                 resyncperiod 60s
                 endpoint https://192.168.100.100:8443
                 tls /mnt/sda1/var/lib/coredns/apiserver.crt /mnt/sda1/var/lib/coredns/apiserver.key /mnt/sda1/var/lib/coredns/ca.crt
                 template {service}.{namespace}.{type}.{zone}
      }
-     proxy . 8.8.8.8:53 8.8.4.4:53
      log stdout {
          class error
      }   
+}
+
+corednsw.local.:53 {
+     kubernetes corednsw.local {
+                resyncperiod 60s
+                endpoint https://192.168.100.100:8443
+                tls /mnt/sda1/var/lib/coredns/apiserver.crt /mnt/sda1/var/lib/coredns/apiserver.key /mnt/sda1/var/lib/coredns/ca.crt
+                template *.{service}.{namespace}.{type}.{zone}
+     }
+     log stdout {
+         class error
+     }
 }

@@ -96,7 +96,7 @@ function modifyDNS {
             currentSearch=
         fi
         if [[ $currentSearch != *svc.coredns.local* ]]; then
-            currentSearch="$currentSearch svc.coredns.local"
+            currentSearch="$currentSearch svc.coredns.local svc.corednsw.local"
             sudo networksetup -setsearchdomains "$line" $currentSearch
         fi
     done
@@ -122,6 +122,7 @@ function cleanupDNS {
         currentSearch=`networksetup -getsearchdomains "$line"`
         if [[ $currentSearch != There* ]] && [[ $currentSearch == *svc.coredns.local* ]]; then
             currentSearch=`echo $currentSearch | sed 's/svc.coredns.local//g' | sed 's/\s*//'`
+            currentSearch=`echo $currentSearch | sed 's/svc.corednsw.local//g' | sed 's/\s*//'`
             sudo networksetup -setsearchdomains "$line" "$currentSearch"
         fi
     done
