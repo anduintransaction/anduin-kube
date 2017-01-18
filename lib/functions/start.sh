@@ -21,7 +21,6 @@ function startMinikube {
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
-             --iso-url=https://storage.googleapis.com/minikube/iso/minikube-v1.0.1.iso \
              --host-only-cidr="${MINIKUBE_CIDR}/24" && \
         minikube stop && \
         VBoxManage modifyvm minikube --nic3 natnetwork && \

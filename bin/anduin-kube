@@ -27,6 +27,9 @@ case $1 in
     restart)
         minikube stop && start
         ;;
+    force-stop)
+        VBoxManage controlvm minikube poweroff
+        ;;
     delete)
         delete
         ;;
