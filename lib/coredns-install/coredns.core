@@ -1,3 +1,10 @@
+.:53 {
+     proxy . 8.8.8.8:53 8.8.4.4:53
+     log stdout {
+         class error
+     }  
+}
+
 coredns.local:53 {
      kubernetes coredns.local {
                 resyncperiod 60s
