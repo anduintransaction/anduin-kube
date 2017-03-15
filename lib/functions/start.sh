@@ -8,11 +8,6 @@ function createNetwork {
     fi
     networkName=`echo "$output" | grep -o "'.*'" | sed "s/'//g"`
     VBoxManage hostonlyif ipconfig --ip $MINIKUBE_CIDR $networkName
-    if VBoxManage list natnets | grep $EXTRA_NAT_NETWORK_NAME > /dev/null 2>&1; then
-        return
-    fi
-    VBoxManage natnetwork add --netname $EXTRA_NAT_NETWORK_NAME --network $EXTRA_NAT_NETWORK_NET --enable --dhcp on && \
-        VBoxManage natnetwork start --netname $EXTRA_NAT_NETWORK_NAME
 }
 
 function startMinikube {
@@ -21,12 +16,7 @@ function startMinikube {
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
-             --host-only-cidr="${MINIKUBE_CIDR}/24" && \
-        minikube stop && \
-        VBoxManage modifyvm minikube --nic3 natnetwork && \
-        VBoxManage modifyvm minikube --nat-network3 minikube && \
-        VBoxManage modifyvm minikube --nictype3 82540EM && \
-        minikube start
+             --host-only-cidr="${MINIKUBE_CIDR}/24"
 }
 
 function installInitService {
@@ -47,12 +37,6 @@ function installCoreDNS {
         copyFileToMinikube coredns /home/docker/coredns-install && \
         rm -f coredns coredns_${COREDNS_VERSION}_linux_x86_64.tgz && \
         runCommandOnMinikube /home/docker/coredns-install/install.sh
-}
-
-function installRoute {
-    echo "Install custom route"
-    copyFileToMinikube $HOME/.anduin-kube/lib/custom-route /home/docker && \
-        runCommandOnMinikube /home/docker/custom-route/install.sh
 }
 
 function runInitService {
@@ -97,7 +81,6 @@ function start {
                 startMinikube && \
                 installInitService && \
                 installCoreDNS && \
-                installRoute && \
                 runInitService && \
                 setupKubernetesNetworking && \
                 waitForKubernetes
