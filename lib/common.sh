@@ -9,9 +9,10 @@ export MINIKUBE_CPU=4
 export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.5.3
+export KUBERNETES_MINIKUBE_VERSION=v1.6.0-beta.3
 export DOCKER_VERSION=1.12.4
 export IMLADRIS_VERSION=0.9.1
-export COREDNS_VERSION=004
+export COREDNS_VERSION=006
 export EXTRA_NAT_NETWORK_NAME=minikube
 export EXTRA_NAT_NETWORK_NET=10.0.72.0/24
 
@@ -88,8 +89,8 @@ function modifyDNS {
         if [[ $currentNS == There* ]]; then
             currentNS=8.8.8.8
         fi
-        if [[ $currentNS != *$MINIKUBE_IP* ]]; then
-            currentNS="$MINIKUBE_IP $currentNS"
+        if [[ $currentNS != *127.0.0.1* ]]; then
+            currentNS="127.0.0.1 $currentNS"
             sudo networksetup -setdnsservers "$line" $currentNS
         fi
 
@@ -117,8 +118,9 @@ function modifyRoute {
 function cleanupDNS {
     networksetup -listallnetworkservices | grep -v '\*' | while read line; do
         currentNS=`networksetup -getdnsservers "$line"`
-        if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]]; then
+        if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]] || [[ $currentNS == *127.0.0.1* ]]; then
             currentNS=`echo $currentNS | sed 's/'$MINIKUBE_IP'//g' | sed 's/\s*//'`
+            currentNS=`echo $currentNS | sed 's/127.0.0.1//g' | sed 's/\s*//'`
             sudo networksetup -setdnsservers "$line" $currentNS
         fi
         currentSearch=`networksetup -getsearchdomains "$line"`

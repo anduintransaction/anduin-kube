@@ -12,7 +12,7 @@ function createNetwork {
 
 function startMinikube {
     minikube start \
-             --kubernetes-version=$KUBERNETES_VERSION \
+             --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION \
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
@@ -26,17 +26,50 @@ function installInitService {
 }
 
 function installCoreDNS {
-    echo "Installing coreDNS"
-    copyFileToMinikube $HOME/.anduin-kube/lib/coredns-install /home/docker && \
-        copyFileToMinikube $HOME/.minikube/ca.crt /home/docker/coredns-install && \
-        copyFileToMinikube $HOME/.minikube/apiserver.crt /home/docker/coredns-install && \
-        copyFileToMinikube $HOME/.minikube/apiserver.key /home/docker/coredns-install && \
-        rm -f coredns_${COREDNS_VERSION}_linux_x86_64.tgz && \
-        wget -O coredns_${COREDNS_VERSION}_linux_x86_64.tgz https://github.com/miekg/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_x86_64.tgz && \
-        tar xzf coredns_${COREDNS_VERSION}_linux_x86_64.tgz && \
-        copyFileToMinikube coredns /home/docker/coredns-install && \
-        rm -f coredns coredns_${COREDNS_VERSION}_linux_x86_64.tgz && \
-        runCommandOnMinikube /home/docker/coredns-install/install.sh
+    if ! which coredns > /dev/null 2>& 1; then
+        echo "Installing coreDNS"
+        wget -O coredns_${COREDNS_VERSION}_darwin_x86_64.tgz https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
+            tar xzf coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
+            copyToUsrLocalBin coredns && \
+            rm coredns_${COREDNS_VERSION}_darwin_x86_64.tgz coredns
+    fi
+    cat $HOME/.anduin-kube/lib/coredns-install/coredns.core | sed 's!__HOME__!'$HOME'!g' > $HOME/.anduin-kube/coredns.core
+}
+
+function startCoreDNS {
+    pidFile=/var/run/coredns.pid
+    if [ -f $pidFile ]; then
+        pid=`cat $pidFile`
+        sudo kill -9 $pid > /dev/null 2>&1
+        sudo rm -f $pidFile
+    fi
+    sudo bash -c "nohup coredns -pidfile $pidFile -conf $HOME/.anduin-kube/coredns.core > /var/log/coredns.log 2>&1" &
+    count=0
+    while [ ! -f $pidFile ]; do
+        echo .
+        sleep 1
+        if [ $count -gt 10 ]; then
+            echo "Cannot start coredns"
+            return 1
+        fi
+        count=`expr $count + 1`
+    done
+    pid=`cat $pidFile`
+    count=0
+    while ! sudo kill -0 $pid > /dev/null 2>&1; do
+        echo .
+        sleep 3
+        if [ $count -gt 10 ]; then
+            echo "Cannot start coredns"
+            return 1
+        fi
+        count=`expr $count + 1`
+    done
+}
+
+function runCoreDNS {
+    echo "Starting CoreDNS"
+    installCoreDNS && startCoreDNS
 }
 
 function runInitService {
@@ -65,13 +98,15 @@ function start {
     stt=`minikubeStatus`
     case $stt in
         started)
-            setupKubernetesNetworking && waitForKubernetes
+            runCoreDNS && \
+                setupKubernetesNetworking && \
+                waitForKubernetes
             ;;
         stopped)
             deleteVBoxNetwork $MINIKUBE_CIDR && \
                 createNetwork && \
-                minikube start && \
-                runInitService && \
+                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION && \
+                runCoreDNS && \
                 setupKubernetesNetworking && \
                 waitForKubernetes
             ;;
@@ -79,9 +114,7 @@ function start {
             deleteVBoxNetwork $MINIKUBE_CIDR && \
                 createNetwork && \
                 startMinikube && \
-                installInitService && \
-                installCoreDNS && \
-                runInitService && \
+                runCoreDNS && \
                 setupKubernetesNetworking && \
                 waitForKubernetes
             ;;
