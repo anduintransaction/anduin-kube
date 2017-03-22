@@ -48,6 +48,7 @@ function start {
                 createNetwork && \
                 VBoxManage modifyvm minikube --nic1 none && \
                 VBoxManage modifyvm minikube --nic1 nat && \
+                VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
                 minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION && \
                 sudo anduin-kube setup-network && \
                 waitForKubernetes
