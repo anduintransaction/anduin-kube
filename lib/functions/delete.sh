@@ -17,13 +17,8 @@ function cleanupVBox {
     deleteVBoxNetwork $MINIKUBE_CIDR
 }
 
-function runRootCommand {
-    echo "Please enter your password if asked"
-    cleanupDNS && cleanupRoute
-}
-
 function delete {
     removeMinikube && \
         cleanupVBox && \
-        runRootCommand
+        sudo anduin-kube cleanup
 }

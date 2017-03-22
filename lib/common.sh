@@ -91,7 +91,7 @@ function modifyDNS {
         fi
         if [[ $currentNS != *127.0.0.1* ]]; then
             currentNS="127.0.0.1 $currentNS"
-            sudo networksetup -setdnsservers "$line" $currentNS
+            networksetup -setdnsservers "$line" $currentNS
         fi
 
         currentSearch=`networksetup -getsearchdomains "$line"`
@@ -100,19 +100,19 @@ function modifyDNS {
         fi
         if [[ $currentSearch != *svc.coredns.local* ]]; then
             currentSearch="$currentSearch svc.coredns.local svc.corednsw.local"
-            sudo networksetup -setsearchdomains "$line" $currentSearch
+            networksetup -setsearchdomains "$line" $currentSearch
         fi
     done
-    sudo launchctl unload /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
-    sudo defaults write /Library/Preferences/com.apple.mDNSResponder.plist AlwaysAppendSearchDomains -bool YES
-    sudo launchctl load /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
+    launchctl unload /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
+    defaults write /Library/Preferences/com.apple.mDNSResponder.plist AlwaysAppendSearchDomains -bool YES
+    launchctl load /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
 }
 
 function modifyRoute {
     if netstat -nr | grep '10/24'; then
         return
     fi
-    sudo route -n add 10.0.0.0/24 $MINIKUBE_IP
+    route -n add 10.0.0.0/24 $MINIKUBE_IP
 }
 
 function cleanupDNS {
@@ -121,23 +121,62 @@ function cleanupDNS {
         if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]] || [[ $currentNS == *127.0.0.1* ]]; then
             currentNS=`echo $currentNS | sed 's/'$MINIKUBE_IP'//g' | sed 's/\s*//'`
             currentNS=`echo $currentNS | sed 's/127.0.0.1//g' | sed 's/\s*//'`
-            sudo networksetup -setdnsservers "$line" $currentNS
+            networksetup -setdnsservers "$line" $currentNS
         fi
         currentSearch=`networksetup -getsearchdomains "$line"`
         if [[ $currentSearch != There* ]] && [[ $currentSearch == *svc.coredns.local* ]]; then
             currentSearch=`echo $currentSearch | sed 's/svc.coredns.local//g' | sed 's/\s*//'`
             currentSearch=`echo $currentSearch | sed 's/svc.corednsw.local//g' | sed 's/\s*//'`
-            sudo networksetup -setsearchdomains "$line" "$currentSearch"
+            networksetup -setsearchdomains "$line" "$currentSearch"
         fi
     done
 }
 
 function cleanupRoute {
     if netstat -nr | grep '10/24'; then
-        sudo route -n delete 10.0.0.0/24
+        route -n delete 10.0.0.0/24
     fi
 }
 
-function setupKubernetesNetworking {
-    modifyDNS && modifyRoute
+function installCoreDNS {
+    if ! which coredns > /dev/null 2>& 1; then
+        echo "Installing coreDNS"
+        wget -O coredns_${COREDNS_VERSION}_darwin_x86_64.tgz https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
+            tar xzf coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
+            copyToUsrLocalBin coredns && \
+            rm coredns_${COREDNS_VERSION}_darwin_x86_64.tgz coredns
+    fi
+    cat $HOME/.anduin-kube/lib/coredns-config/coredns.core | sed 's!__HOME__!'$HOME'!g' > $HOME/.anduin-kube/coredns.core
+}
+
+function startCoreDNS {
+    installCoreDNS && stopCoreDNS
+    if [ $? -ne 0 ]; then
+        echo "Cannot start coredns"
+        exit 0
+    fi
+    echo "Starting coredns"
+    nohup coredns -conf $HOME/.anduin-kube/coredns.core > /var/log/coredns.log 2>&1 &
+    pid=$!
+    count=0
+    while ! kill -0 $pid > /dev/null 2>&1; do
+        echo .
+        sleep 3
+        if [ $count -gt 10 ]; then
+            echo "Cannot start coredns"
+            return 1
+        fi
+        count=`expr $count + 1`
+    done
+}
+
+function stopCoreDNS {
+    echo "Stop coredns"
+    pids=`ps -ef | grep coredns | grep -v grep | awk '{print $2}'`
+    if [ -z "$pids" ]; then
+        return
+    fi
+    for pid in $pids; do
+        kill -9 $pid > /dev/null 2>&1
+    done
 }

@@ -31,7 +31,7 @@ case $1 in
         stop && start
         ;;
     force-stop)
-        VBoxManage controlvm minikube poweroff
+        forceStop
         ;;
     delete)
         delete
@@ -39,8 +39,11 @@ case $1 in
     version)
         version
         ;;
-    network)
-        network
+    setup-network)
+        setupNetwork
+        ;;
+    cleanup)
+        cleanup
         ;;
     update)
         update
