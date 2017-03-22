@@ -12,6 +12,7 @@ coredns.local:53 {
                 tls __HOME__/.minikube/apiserver.crt __HOME__/.minikube/apiserver.key __HOME__/.minikube/ca.crt
                 template {service}.{namespace}.{type}.{zone}
      }
+     cache 360 coredns.local
      log stdout {
          class error
      }   
@@ -24,6 +25,7 @@ corednsw.local.:53 {
                 tls __HOME__/.minikube/apiserver.crt __HOME__/.minikube/apiserver.key __HOME__/.minikube/ca.crt
                 template *.{service}.{namespace}.{type}.{zone}
      }
+     cache 360 corednsw.local
      log stdout {
          class error
      }

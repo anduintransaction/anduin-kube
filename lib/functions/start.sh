@@ -43,6 +43,7 @@ function startCoreDNS {
         sudo kill -9 $pid > /dev/null 2>&1
         sudo rm -f $pidFile
     fi
+    sudo echo "."
     sudo bash -c "nohup coredns -pidfile $pidFile -conf $HOME/.anduin-kube/coredns.core > /var/log/coredns.log 2>&1" &
     count=0
     while [ ! -f $pidFile ]; do
