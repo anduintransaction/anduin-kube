@@ -11,7 +11,7 @@ function installImladris {
             return
         fi
     fi
-    wget https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
+    wget -O imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
         tar xzf imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
         rm imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
         copyToUsrLocalBin imladris && \
