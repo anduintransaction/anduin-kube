@@ -93,19 +93,7 @@ function modifyDNS {
             currentNS="127.0.0.1 $currentNS"
             networksetup -setdnsservers "$line" $currentNS
         fi
-
-        currentSearch=`networksetup -getsearchdomains "$line"`
-        if [[ $currentSearch == There* ]]; then
-            currentSearch=
-        fi
-        if [[ $currentSearch != *svc.coredns.local* ]]; then
-            currentSearch="$currentSearch svc.coredns.local svc.corednsw.local"
-            networksetup -setsearchdomains "$line" $currentSearch
-        fi
     done
-    launchctl unload /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
-    defaults write /Library/Preferences/com.apple.mDNSResponder.plist AlwaysAppendSearchDomains -bool YES
-    launchctl load /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
 }
 
 function modifyRoute {
