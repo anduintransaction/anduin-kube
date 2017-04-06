@@ -10,7 +10,8 @@ function removeMinikube {
         kubectl config delete-context minikube
     fi
     echo "Deleting minikube configs"
-    rm -rf ~/.minikube
+    home=$HOME
+    sudo rm -rf $HOME/.minikube
 }
 
 function cleanupVBox {
