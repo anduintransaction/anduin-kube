@@ -46,7 +46,7 @@ function start {
     stt=`minikubeStatus`
     case $stt in
         started)
-            sudo anduin-kube setup-network && \
+            anduin-kube fix && \
                 waitForKubernetes
             ;;
         stopped)
@@ -57,14 +57,14 @@ function start {
                 VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
                 VBoxManage modifyvm minikube --natdnshostresolver1 on && \
                 minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION && \
-                sudo anduin-kube setup-network && \
+                anduin-kube fix && \
                 waitForKubernetes
             ;;
         *)
             deleteVBoxNetwork $MINIKUBE_CIDR && \
                 createNetwork && \
                 startMinikube && \
-                sudo anduin-kube setup-network && \
+                anduin-kube fix && \
                 waitForKubernetes
             ;;
     esac    
