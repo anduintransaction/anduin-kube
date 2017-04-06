@@ -16,7 +16,13 @@ function startMinikube {
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
-             --host-only-cidr="${MINIKUBE_CIDR}/24"
+             --host-only-cidr="${MINIKUBE_CIDR}/24" && \
+        minikube stop && \
+        VBoxManage modifyvm minikube --nic1 none && \
+        VBoxManage modifyvm minikube --nic1 nat && \
+        VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
+        VBoxManage modifyvm minikube --natdnshostresolver1 on && \
+        minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION
 }
 
 function waitForKubernetes {
