@@ -1,13 +1,16 @@
+.:53 {
+     proxy . 8.8.8.8:53 8.8.4.4:53
+     log stdout {
+         class error
+     }  
+}
+
 kube:53 {
      kubernetes kube {
                 resyncperiod 60s
                 endpoint https://192.168.144.100:8443
                 tls __HOME__/.minikube/apiserver.crt __HOME__/.minikube/apiserver.key __HOME__/.minikube/ca.crt
                 template {service}.{namespace}.{type}.{zone}
-     }
-     cache 360 kube {
-           success 10000 360
-           denial 10 10
      }
      log stdout {
          class denial
