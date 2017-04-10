@@ -11,7 +11,7 @@ export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.5.3
 export KUBERNETES_MINIKUBE_VERSION=https://github.com/anduintransaction/minikube/releases/download/localkube-1.5.5/localkube-v1.5.5
 export DOCKER_VERSION=1.12.4
-export IMLADRIS_VERSION=0.9.2
+export IMLADRIS_VERSION=0.10.0
 export COREDNS_VERSION=006
 export EXTRA_NAT_NETWORK_NAME=minikube
 export EXTRA_NAT_NETWORK_NET=10.0.72.0/24
@@ -118,6 +118,8 @@ function cleanupDNS {
             networksetup -setsearchdomains "$line" "$currentSearch"
         fi
     done
+    killall -HUP mDNSResponder
+    dscacheutil -flushcache
 }
 
 function cleanupRoute {
