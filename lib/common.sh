@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-export MINIKUBE_VERSION=v0.17.1
-export MINIKUBE_ISO_VERSION=v1.0.7
+export MINIKUBE_VERSION=v0.18.0
+export MINIKUBE_ISO_VERSION=v0.18.0
 export MINIKUBE_CIDR=192.168.144.1
 export MINIKUBE_DHCP_IP=192.168.144.6
 export MINIKUBE_IP=192.168.144.100
 export MINIKUBE_CPU=4
 export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
-export KUBERNETES_VERSION=v1.5.3
-export KUBERNETES_MINIKUBE_VERSION=https://github.com/anduintransaction/minikube/releases/download/localkube-1.5.5/localkube-v1.5.5
+export KUBERNETES_VERSION=v1.6.0
+export KUBERNETES_MINIKUBE_VERSION=v1.6.0
 export DOCKER_VERSION=1.12.4
 export IMLADRIS_VERSION=0.10.0
 export COREDNS_VERSION=006
