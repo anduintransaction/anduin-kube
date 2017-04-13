@@ -31,6 +31,7 @@ function waitForKubernetes {
     until curl -sS -m 10 -f -o /dev/null --head http://kubernetes-dashboard.kube-system.svc.kube 2>/dev/null; do
         printf .
         count=`expr $count + 1`
+        sudo anduin-kube clear-cache
         sleep 10
         if [ $count -gt 24 ]; then
             echo

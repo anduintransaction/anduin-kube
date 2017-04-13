@@ -54,6 +54,9 @@ case $1 in
     fix)
         fix
         ;;
+    clear-cache)
+        clearCache
+        ;;
     *)
         minikube $@
         ;;

@@ -118,8 +118,7 @@ function cleanupDNS {
             networksetup -setsearchdomains "$line" "$currentSearch"
         fi
     done
-    killall -HUP mDNSResponder
-    dscacheutil -flushcache
+    anduin-kube clear-cache
 }
 
 function cleanupRoute {
