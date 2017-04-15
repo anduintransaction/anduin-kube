@@ -1,4 +1,5 @@
 kube:53 {
+     rewrite type ANY A
      kubernetes kube {
                 resyncperiod 60s
                 endpoint https://192.168.144.100:8443
