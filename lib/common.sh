@@ -97,6 +97,8 @@ function modifyDNS {
     launchctl unload /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
     defaults write /Library/Preferences/com.apple.mDNSResponder.plist StrictUnicastOrdering -bool YES
     launchctl load /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
+    killall -USR1 mDNSResponder
+    killall -USR2 mDNSResponder
 }
 
 function modifyRoute {
