@@ -40,6 +40,11 @@ function copyToUsrLocalBin {
     fi
 }
 
+function echoLog {
+    now=`date '+%Y-%m-%d %H:%M:%S'`
+    echo -e "$now\t$1"
+}
+
 function minikubeStatus {
     case $(minikube status | grep minikubeVM | sed 's/minikubeVM: //') in
         Running)
@@ -167,6 +172,37 @@ function startCoreDNS {
 function stopCoreDNS {
     echo "Stop coredns"
     pids=`ps -ef | grep coredns | grep -v grep | awk '{print $2}'`
+    if [ -z "$pids" ]; then
+        return
+    fi
+    for pid in $pids; do
+        kill -9 $pid > /dev/null 2>&1
+    done
+}
+
+function startHealthz {
+    pids=`ps -ef | grep "anduin-kube healthz" | grep -v grep | awk '{print $2}'`
+    if [ ! -z "$pids" ]; then
+        return
+    fi
+    echo "Starting health check"
+    nohup anduin-kube healthz > /var/log/anduin-kube-healthz.log 2>&1 &
+    pid=$!
+    count=0
+    while ! kill -0 $pid > /dev/null 2>&1; do
+        echo .
+        sleep 3
+        if [ $count -gt 10 ]; then
+            echo "Cannot start health check"
+            return 1
+        fi
+        count=`expr $count + 1`
+    done
+}
+
+function stopHealthz {
+    echo "Stopping health check"
+    pids=`ps -ef | grep "anduin-kube healthz" | grep -v grep | awk '{print $2}'`
     if [ -z "$pids" ]; then
         return
     fi

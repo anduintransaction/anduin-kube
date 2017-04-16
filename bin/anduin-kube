@@ -42,6 +42,9 @@ case $1 in
     setup-network)
         setupNetwork
         ;;
+    healthz)
+        healthz
+        ;;
     cleanup)
         cleanup
         ;;

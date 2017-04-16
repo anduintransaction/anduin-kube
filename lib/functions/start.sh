@@ -40,6 +40,8 @@ function waitForKubernetes {
         fi
     done
     echo
+    sudo killall -USR1 mDNSResponder
+    sudo killall -USR2 mDNSResponder
     echo "Done"
 }
 
