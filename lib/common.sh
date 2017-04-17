@@ -181,10 +181,7 @@ function stopCoreDNS {
 }
 
 function startHealthz {
-    pids=`ps -ef | grep "anduin-kube healthz" | grep -v grep | awk '{print $2}'`
-    if [ ! -z "$pids" ]; then
-        return
-    fi
+    stopHealthz
     echo "Starting health check"
     nohup anduin-kube healthz > /var/log/anduin-kube-healthz.log 2>&1 &
     pid=$!

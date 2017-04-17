@@ -23,7 +23,7 @@ function checkAlive {
 
 function tryFix {
     echoLog "Try fix"
-    anduin-kube fix
+    anduin-kube clear-cache
 }
 
 function healthz {
@@ -31,6 +31,7 @@ function healthz {
         echoLog "Must be root"
         exit 1
     fi
+    echoLog "Healthz started"
     sleep $INITIAL_DELAY
     while true; do
         if ! checkAlive; then
