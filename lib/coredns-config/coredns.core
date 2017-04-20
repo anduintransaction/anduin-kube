@@ -6,7 +6,6 @@ kube:53 {
                 tls __HOME__/.minikube/apiserver.crt __HOME__/.minikube/apiserver.key __HOME__/.minikube/ca.crt
                 template {service}.{namespace}.{type}.{zone}
      }
-     cache 3600 kube
      log stdout {
          class all
      }
