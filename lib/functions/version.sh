@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ANDUIN_KUBE_VERSION=0.13.5
+ANDUIN_KUBE_VERSION=0.13.6
 
 function version {
     echo "anduin-kube version: $ANDUIN_KUBE_VERSION"
