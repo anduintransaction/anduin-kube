@@ -136,7 +136,16 @@ function cleanupRoute {
 }
 
 function installCoreDNS {
-    if ! which coredns > /dev/null 2>& 1; then
+    needInstall=0
+    if ! which coredns > /dev/null 2>&1; then
+        needInstall=1
+    else
+        version=`coredns --version`
+        if [ "$version" != "CoreDNS-$COREDNS_VERSION" ]; then
+            needInstall=1
+        fi
+    fi
+    if [ $needInstall -eq 1 ]; then
         echo "Installing coreDNS"
         wget -O coredns_${COREDNS_VERSION}_darwin_x86_64.tgz https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
             tar xzf coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
