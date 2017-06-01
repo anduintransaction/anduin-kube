@@ -46,6 +46,9 @@ function waitForKubernetes {
 }
 
 function start {
+    # Ask for admin password right away
+    sudo ls / > /dev/null 2>&1
+    
     stt=`minikubeStatus`
     case $stt in
         started)
