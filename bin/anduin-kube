@@ -20,6 +20,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+ensureRootCA $HOME/.anduin-kube/lib/ca.cert.pem
+
 case $1 in
     start)
         start
