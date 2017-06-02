@@ -10,3 +10,11 @@ kube:53 {
          class all
      }
 }
+
+anduin.local:53 {
+     file __HOME__/.anduin-kube/lib/coredns-config/zones.conf anduin.local {
+     }
+     log stdout {
+         class all
+     }
+}
