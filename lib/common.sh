@@ -214,3 +214,27 @@ function stopHealthz {
         kill -9 $pid > /dev/null 2>&1
     done
 }
+
+function installRootCA {
+    echo "Installing Root CA $1"
+    # We don't need this much trust, but well...
+    sudo security add-trusted-cert \
+         -d -r trustRoot \
+         -p ssl -p smime -p codeSign -p IPSec -p iChat -p basic -p swUpdate -p pkgSign -p pkinitClient -p pkinitServer -p eap \
+         -k /Library/Keychains/System.keychain $1
+
+}
+
+function ensureRootCA {
+    security verify-cert -q -L -c $1 \
+             -p ssl -p smime -p codeSign -p IPSec -p iChat -p basic -p swUpdate -p pkgSign -p pkinitClient -p pkinitServer -p eap
+    if [ $? -ne 0 ]; then
+        installRootCA $1
+    fi
+}
+
+function uninstallRootCA {
+    echo "Unnstalling Root CA $1"
+    # TODO: This only marks the cert as untrusted. To be clean, delete it from the keychain as well.
+    sudo security remove-trusted-cert -d $1
+}
