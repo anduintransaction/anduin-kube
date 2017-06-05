@@ -10,3 +10,12 @@ kube:53 {
          class all
      }
 }
+
+.:53 {
+     auto {
+         directory __HOME__/.anduin-kube/zones
+     }
+     log stdout {
+         class all
+     }
+}
