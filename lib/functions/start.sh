@@ -13,8 +13,6 @@ function createNetwork {
 function startMinikube {
     minikube start \
              --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION \
-             --extra-config=proxy.IPTables.SyncPeriod.Duration=5000000000 \
-             --extra-config=proxy.IPTables.MinSyncPeriod.Duration=3000000000 \
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
@@ -64,9 +62,7 @@ function start {
                 VBoxManage modifyvm minikube --nic1 nat && \
                 VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
                 VBoxManage modifyvm minikube --natdnshostresolver1 on && \
-                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION \
-                         --extra-config=proxy.IPTables.SyncPeriod.Duration=5000000000 \
-                         --extra-config=proxy.IPTables.MinSyncPeriod.Duration=3000000000 && \
+                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION && \
                 anduin-kube fix && \
                 waitForKubernetes
             ;;
