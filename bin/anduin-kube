@@ -60,6 +60,9 @@ case $1 in
     clear-cache)
         clearCache
         ;;
+    time-sync)
+        timeSync
+        ;;
     *)
         minikube $@
         ;;
