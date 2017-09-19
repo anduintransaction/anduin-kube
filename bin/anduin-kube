@@ -50,9 +50,12 @@ case $1 in
         ;;
     update)
         update
-        ;;
+        ;;    
     update-iso)
         updateIso
+        ;;
+    force-update)
+        forceStop && update && updateIso && start
         ;;
     fix)
         fix
