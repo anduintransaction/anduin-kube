@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ntp
+  namespace: kube-system
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      labels:
+        name: ntp
+    spec:
+      containers:
+        - name: ntp
+          image: anduin/ntp:1.0
+          securityContext:
+            privileged: true

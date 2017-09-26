@@ -46,7 +46,7 @@ function echoLog {
 }
 
 function minikubeStatus {
-    case $(minikube status | grep minikubeVM | sed 's/minikubeVM: //') in
+    case $(minikube status | grep minikube | sed 's/minikube: //') in
         Running)
             echo "started"
             ;;
@@ -213,4 +213,9 @@ function stopHealthz {
     for pid in $pids; do
         kill -9 $pid > /dev/null 2>&1
     done
+}
+
+function startTimeSync {
+    kubectl delete deployment ntp --namespace kube-system --context minikube --ignore-not-found=true &&
+        kubectl create -f $HOME/.anduin-kube/lib/services/ntp/deployment.yml
 }

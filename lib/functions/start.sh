@@ -48,30 +48,32 @@ function waitForKubernetes {
 function start {
     # Ask for admin password right away
     sudo ls / > /dev/null 2>&1
-    
+
     stt=`minikubeStatus`
     case $stt in
         started)
-            anduin-kube fix && \
-                waitForKubernetes
+            anduin-kube fix &&
+                waitForKubernetes &&
+                startTimeSync
             ;;
         stopped)
-            deleteVBoxNetwork $MINIKUBE_CIDR && \
-                createNetwork && \
-                VBoxManage modifyvm minikube --nic1 none && \
-                VBoxManage modifyvm minikube --nic1 nat && \
-                VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
-                VBoxManage modifyvm minikube --natdnshostresolver1 on && \
-                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION && \
-                anduin-kube fix && \
-                waitForKubernetes
+            deleteVBoxNetwork $MINIKUBE_CIDR &&
+                createNetwork &&
+                VBoxManage modifyvm minikube --nic1 none &&
+                VBoxManage modifyvm minikube --nic1 nat &&
+                VBoxManage modifyvm minikube --natnet1 "192.168.171/24" &&
+                VBoxManage modifyvm minikube --natdnshostresolver1 on &&
+                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION &&
+                anduin-kube fix &&
+                waitForKubernetes &&
+                startTimeSync
             ;;
         *)
-            deleteVBoxNetwork $MINIKUBE_CIDR && \
-                createNetwork && \
-                startMinikube && \
-                anduin-kube fix && \
+            deleteVBoxNetwork $MINIKUBE_CIDR &&
+                createNetwork &&
+                startMinikube &&
+                anduin-kube fix &&
                 waitForKubernetes
             ;;
-    esac    
+    esac
 }
