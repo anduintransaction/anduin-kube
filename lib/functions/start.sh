@@ -13,6 +13,7 @@ function createNetwork {
 function startMinikube {
     minikube start \
              --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION \
+             --bootstrapper=kubeadm \
              --cpus=$MINIKUBE_CPU \
              --disk-size=$MINIKUBE_DISK_SIZE \
              --memory=$MINIKUBE_RAM \
@@ -22,7 +23,7 @@ function startMinikube {
         VBoxManage modifyvm minikube --nic1 nat && \
         VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
         VBoxManage modifyvm minikube --natdnshostresolver1 on && \
-        minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION
+        minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION --bootstrapper=kubeadm
 }
 
 function waitForKubernetes {
@@ -63,7 +64,7 @@ function start {
                 VBoxManage modifyvm minikube --nic1 nat &&
                 VBoxManage modifyvm minikube --natnet1 "192.168.171/24" &&
                 VBoxManage modifyvm minikube --natdnshostresolver1 on &&
-                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION &&
+                minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION --bootstrapper=kubeadm &&
                 anduin-kube fix &&
                 waitForKubernetes &&
                 startTimeSync
@@ -73,7 +74,8 @@ function start {
                 createNetwork &&
                 startMinikube &&
                 anduin-kube fix &&
-                waitForKubernetes
+                waitForKubernetes &&
+                startTimeSync
             ;;
     esac
 }
