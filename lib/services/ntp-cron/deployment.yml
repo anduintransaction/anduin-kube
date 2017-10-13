@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ntp
+  name: ntp-cron
   namespace: kube-system
 spec:
   replicas: 1
@@ -9,10 +9,10 @@ spec:
   template:
     metadata:
       labels:
-        name: ntp
+        name: ntp-cron
     spec:
       containers:
-        - name: ntp
-          image: anduin/ntp:1.1
+        - name: ntp-cron
+          image: anduin/ntp-cron:1.0
           securityContext:
             privileged: true

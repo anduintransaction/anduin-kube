@@ -216,6 +216,7 @@ function stopHealthz {
 }
 
 function startTimeSync {
-    kubectl delete deployment ntp --namespace kube-system --context minikube --ignore-not-found=true &&
-        kubectl create -f $HOME/.anduin-kube/lib/services/ntp/deployment.yml
+    kubectl delete deployment ntp ntp-cron --namespace kube-system --context minikube --ignore-not-found=true &&
+        kubectl create -f $HOME/.anduin-kube/lib/services/ntp/deployment.yml &&
+        kubectl create -f $HOME/.anduin-kube/lib/services/ntp-cron/deployment.yml
 }
