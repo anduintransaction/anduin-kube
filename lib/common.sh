@@ -105,10 +105,12 @@ function modifyDNS {
 }
 
 function modifyRoute {
-    if netstat -nr | grep '10/24'; then
-        return
+    if ! netstat -nr | grep -q '10/24'; then
+        route -n add 10.0.0.0/24 $MINIKUBE_IP
     fi
-    route -n add 10.0.0.0/24 $MINIKUBE_IP
+    if ! netstat -nr | grep -q '172.17/24'; then
+        route -n add 172.17.0.0/24 $MINIKUBE_IP
+    fi
 }
 
 function cleanupDNS {
