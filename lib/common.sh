@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-export MINIKUBE_VERSION=v0.22.3
-export MINIKUBE_ISO_VERSION=v0.23.5
+export MINIKUBE_VERSION=v0.24.1
+export MINIKUBE_ISO_VERSION=v0.23.6
 export MINIKUBE_CIDR=192.168.144.1
 export MINIKUBE_DHCP_IP=192.168.144.6
 export MINIKUBE_IP=192.168.144.100
 export MINIKUBE_CPU=4
 export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
-export KUBERNETES_VERSION=v1.7.5
-export KUBERNETES_MINIKUBE_VERSION=v1.7.5
+export KUBERNETES_VERSION=v1.8.0
+export KUBERNETES_MINIKUBE_VERSION=v1.8.0
 export DOCKER_VERSION=1.12.6
 export IMLADRIS_VERSION=0.12.3
 export COREDNS_VERSION=010
@@ -105,8 +105,8 @@ function modifyDNS {
 }
 
 function modifyRoute {
-    if ! netstat -nr | grep -q '10/24'; then
-        route -n add 10.0.0.0/24 $MINIKUBE_IP
+    if ! netstat -nr | grep -q '10.96/12'; then
+        route -n add 10.96.0.0/12 $MINIKUBE_IP
     fi
     if ! netstat -nr | grep -q '172.17/24'; then
         route -n add 172.17.0.0/24 $MINIKUBE_IP
@@ -132,8 +132,11 @@ function cleanupDNS {
 }
 
 function cleanupRoute {
-    if netstat -nr | grep '10/24'; then
-        route -n delete 10.0.0.0/24
+    if netstat -nr | grep '10.96/12'; then
+        route -n delete 10.96.0.0/12
+    fi
+    if netstat -nr | grep '172.17/24'; then
+        route -n delete 172.17.0.0/24
     fi
 }
 
