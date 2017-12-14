@@ -4,7 +4,6 @@ kube:53, kube-local.io:53 {
                 resyncperiod 60s
                 endpoint https://192.168.144.100:8443
                 tls __HOME__/.minikube/apiserver.crt __HOME__/.minikube/apiserver.key __HOME__/.minikube/ca.crt
-                template {service}.{namespace}.{type}.{zone}
      }
      log stdout {
          class all

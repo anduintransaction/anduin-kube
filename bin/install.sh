@@ -11,10 +11,22 @@ function installImladris {
             return
         fi
     fi
-    wget -O imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
-        tar xzf imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
-        rm imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz && \
-        copyToUsrLocalBin imladris && \
+    case `uname` in
+        Darwin)
+            downloadLink=https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-darwin-amd64.tar.gz
+            ;;
+        Linux)
+            downloadLink=https://github.com/anduintransaction/imladris/releases/download/$IMLADRIS_VERSION/imladris-$IMLADRIS_VERSION-linux-amd64.tar.gz
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+    wget -O imladris.tar.gz $downloadLink &&
+        tar xzf imladris.tar.gz &&
+        rm imladris.tar.gz &&
+        copyToUsrLocalBin imladris &&
         rm imladris
 }
 
@@ -25,10 +37,22 @@ function installDockerCommandline {
             return
         fi
     fi
-    wget https://get.docker.com/builds/Darwin/x86_64/docker-${DOCKER_VERSION}.tgz && \
-        tar xzf docker-${DOCKER_VERSION}.tgz && \
-        rm docker-${DOCKER_VERSION}.tgz && \
-        copyToUsrLocalBin docker/docker && \
+    case `uname` in
+        Darwin)
+            downloadLink=https://download.docker.com/mac/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz
+            ;;
+        Linux)
+            downloadLink=https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+    wget $downloadLink &&
+        tar xzf docker-${DOCKER_VERSION}.tgz &&
+        rm docker-${DOCKER_VERSION}.tgz &&
+        copyToUsrLocalBin docker/docker &&
         rm -rf docker
 }
 

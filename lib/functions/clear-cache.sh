@@ -5,7 +5,11 @@ function clearCache {
         echo "Must be root"
         exit 1
     fi
-    killall -HUP mDNSResponder
-    dscacheutil -flushcache
+    case `uname` in
+        Darwin)
+            killall -HUP mDNSResponder
+            dscacheutil -flushcache
+            ;;
+    esac
 }
 

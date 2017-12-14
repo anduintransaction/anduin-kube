@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
 function checkDeps {
-    if which VBoxManage > /dev/null 2>&1; then
-        return
+    if ! which VBoxManage > /dev/null 2>&1; then
+        echo "VirtualBox not found. Please install Docker Toolbox: https://www.docker.com/products/docker-toolbox"
+        return 1
     fi
-    echo "VirtualBox not found. Please install Docker Toolbox: https://www.docker.com/products/docker-toolbox"
-    exit 1
+    case `uname` in
+        Linux)
+            if ! which nmcli > /dev/null 2>&1; then
+                echo "NMCLI not found, please install network manager"
+                return 1
+            fi
+    esac
 }
 
 function installMinikube {
@@ -16,7 +22,19 @@ function installMinikube {
         fi
     fi
     echo "Installing minikube $MINIKUBE_VERSION"
-    curl -Lo minikube https://storage.googleapis.com/minikube/releases/$MINIKUBE_VERSION/minikube-darwin-amd64 && \
+    case `uname` in
+        Darwin)
+            downloadLink=https://storage.googleapis.com/minikube/releases/$MINIKUBE_VERSION/minikube-darwin-amd64
+            ;;
+        Linux)
+            downloadLink=https://storage.googleapis.com/minikube/releases/$MINIKUBE_VERSION/minikube-linux-amd64
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+    wget -O minikube $downloadLink && \
         chmod +x minikube && \
         copyToUsrLocalBin minikube && \
         rm minikube
@@ -30,7 +48,19 @@ function installKubectl {
         fi
     fi
     echo "Installing kubectl $KUBERNETES_VERSION"
-    curl -O https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/darwin/amd64/kubectl && \
+    case `uname` in
+        Darwin)
+            downloadLink=https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/darwin/amd64/kubectl
+            ;;
+        Linux)
+            downloadLink=https://storage.googleapis.com/kubernetes-release/release/$KUBERNETES_VERSION/bin/linux/amd64/kubectl
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+    wget -O kubectl $downloadLink && \
         chmod 755 kubectl && \
         copyToUsrLocalBin kubectl && \
         rm kubectl

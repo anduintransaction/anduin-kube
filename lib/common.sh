@@ -10,9 +10,9 @@ export MINIKUBE_RAM=4096
 export MINIKUBE_DISK_SIZE=50g
 export KUBERNETES_VERSION=v1.8.0
 export KUBERNETES_MINIKUBE_VERSION=v1.8.0
-export DOCKER_VERSION=1.12.6
+export DOCKER_VERSION=17.09.1-ce
 export IMLADRIS_VERSION=0.12.3
-export COREDNS_VERSION=010
+export COREDNS_VERSION=1.0.1
 export EXTRA_NAT_NETWORK_NAME=minikube
 export EXTRA_NAT_NETWORK_NET=10.0.72.0/24
 
@@ -32,8 +32,8 @@ function copyToUsrLocalBin {
         currentUser=`getCurrentUser`
         currentGroup=`getCurrentUserGroup`
         sudo cp $fileToCopy /usr/local/bin
-        sudo chmod 755 /usr/local/bin/$fileToCopy
-        sudo chown $currentUser:$currentGroup /usr/local/bin/$fileToCopy
+        sudo chmod 755 /usr/local/bin/`basename $fileToCopy`
+        sudo chown $currentUser:$currentGroup /usr/local/bin/`basename $fileToCopy`
     else
         cp $fileToCopy /usr/local/bin
         rm /usr/local/bin/$filename
@@ -88,7 +88,7 @@ function runCommandOnMinikube {
     ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.minikube/machines/minikube/id_rsa docker@$MINIKUBE_IP $@
 }
 
-function modifyDNS {
+function modifyDNSDarwin {
     networksetup -listallnetworkservices | grep -v '\*' | while read line; do
         currentNS=`networksetup -getdnsservers "$line"`
         if [[ $currentNS == There* ]]; then
@@ -104,7 +104,43 @@ function modifyDNS {
     launchctl load /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
 }
 
-function modifyRoute {
+function addCustomDNSLinux {
+    resolvConfHeadFile=/etc/resolvconf/resolv.conf.d/head
+    if [ -f $resolvConfHeadFile ]; then
+        if ! grep -q 'nameserver 127.0.0.1' $resolvConfHeadFile; then
+            echo 'nameserver 127.0.0.1' > $resolvConfHeadFile
+        fi
+        resolvconf -u
+    fi
+}
+
+function killDnsmasq {
+    killall dnsmasq > /dev/null 2>&1 || true
+}
+
+function modifyDNSLinux {
+    sed -i 's/^dns=dnsmasq/#dns=dnsmasq/' /etc/NetworkManager/NetworkManager.conf &&
+        addCustomDNSLinux &&
+        systemctl restart NetworkManager &&
+        killDnsmasq
+}
+
+function modifyDNS {
+    case `uname` in
+        Darwin)
+            modifyDNSDarwin
+            ;;
+        Linux)
+            modifyDNSLinux
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+}
+
+function modifyRouteDarwin {
     if ! netstat -nr | grep -q '10.96/12'; then
         route -n add 10.96.0.0/12 $MINIKUBE_IP
     fi
@@ -113,7 +149,31 @@ function modifyRoute {
     fi
 }
 
-function cleanupDNS {
+function modifyRouteLinux {
+    if ! route -n | grep -q '10.96.0.0'; then
+        ip route add 10.96.0.0/12 via $MINIKUBE_IP
+    fi
+    if ! route -n | grep -q '172.17.0.0'; then
+        ip route add 172.17.0.0/24 via $MINIKUBE_IP
+    fi
+}
+
+function modifyRoute {
+    case `uname` in
+        Darwin)
+            modifyRouteDarwin
+            ;;
+        Linux)
+            modifyRouteLinux
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+}
+
+function cleanupDNSDarwin {
     networksetup -listallnetworkservices | grep -v '\*' | while read line; do
         currentNS=`networksetup -getdnsservers "$line"`
         if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]] || [[ $currentNS == *127.0.0.1* ]]; then
@@ -131,7 +191,35 @@ function cleanupDNS {
     anduin-kube clear-cache
 }
 
-function cleanupRoute {
+function cleanupCustomDNSLinux {
+    resolvConfHeadFile=/etc/resolvconf/resolv.conf.d/head
+    if [ -f $resolvConfHeadFile ]; then
+        sed -i '/nameserver 127.0.0.1/d' $resolvConfHeadFile
+        resolvconf -u
+    fi
+}
+
+function cleanupDNSLinux {
+    cleanupCustomDNSLinux &&
+        systemctl restart NetworkManager
+}
+
+function cleanupDNS {
+    case `uname` in
+        Darwin)
+            cleanupDNSDarwin
+            ;;
+        Linux)
+            cleanupDNSLinux
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+}
+
+function cleanupRouteDarwin {
     if netstat -nr | grep '10.96/12'; then
         route -n delete 10.96.0.0/12
     fi
@@ -140,24 +228,66 @@ function cleanupRoute {
     fi
 }
 
+function cleanupRouteLinux {
+    if route -n | grep -q '10.96.0.0'; then
+        ip route del 10.96.0.0/12
+    fi
+    if route -n | grep -q '172.17.0.0'; then
+        ip route del 172.17.0.0/24
+    fi
+}
+
+function cleanupRoute {
+    case `uname` in
+        Darwin)
+            cleanupRouteDarwin
+            ;;
+        Linux)
+            cleanupRouteLinux
+            ;;
+        *)
+            echo "Not supported"
+            return 1
+            ;;
+    esac
+}
+
 function installCoreDNS {
     needInstall=0
     if ! which coredns > /dev/null 2>&1; then
         needInstall=1
     else
-        version=`coredns --version`
+        version=`coredns --version | head -1`
         if [ "$version" != "CoreDNS-$COREDNS_VERSION" ]; then
             needInstall=1
         fi
     fi
     if [ $needInstall -eq 1 ]; then
         echo "Installing coreDNS"
-        wget -O coredns_${COREDNS_VERSION}_darwin_x86_64.tgz https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
-            tar xzf coredns_${COREDNS_VERSION}_darwin_x86_64.tgz && \
+        case `uname` in
+            Darwin)
+                downloadLink=https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_darwin_amd64.tgz
+                ;;
+            Linux)
+                downloadLink=https://github.com/coredns/coredns/releases/download/v${COREDNS_VERSION}/coredns_${COREDNS_VERSION}_linux_amd64.tgz
+                ;;
+            *)
+                echo "Not supported"
+                return 1
+                ;;
+        esac
+        wget -O coredns.tgz $downloadLink &&
+            tar xzf coredns.tgz && \
             copyToUsrLocalBin coredns && \
-            rm coredns_${COREDNS_VERSION}_darwin_x86_64.tgz coredns
+            rm coredns.tgz coredns
     fi
+    mkdir -p $HOME/.anduin-kube/zones
     cat $HOME/.anduin-kube/lib/coredns-config/coredns.core | sed 's!__HOME__!'$HOME'!g' > $HOME/.anduin-kube/coredns.core
+    userAndGroup=`ls -la $HOME | awk '{if ($9 == ".") print $3"\t"$4}'`
+    user=`echo "$userAndGroup" | cut -f 1`
+    group=`echo "$userAndGroup" | cut -f 2`
+    chown -R $user:$group $HOME/.anduin-kube/zones
+    chown -R $user:$group $HOME/.anduin-kube/coredns.core
 }
 
 function startCoreDNS {
