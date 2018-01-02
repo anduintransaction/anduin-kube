@@ -106,9 +106,18 @@ function modifyDNSDarwin {
 
 function addCustomDNSLinux {
     resolvConfHeadFile=/etc/resolvconf/resolv.conf.d/head
+    archLinuxResolvConfFile=/etc/resolvconf.conf
     if [ -f $resolvConfHeadFile ]; then
         if ! grep -q 'nameserver 127.0.0.1' $resolvConfHeadFile; then
             echo 'nameserver 127.0.0.1' > $resolvConfHeadFile
+        fi
+        resolvconf -u
+    elif [ -f $archLinuxResolvConfFile ]; then
+        if ! grep -q 'prepend_nameservers 127.0.0.1' $archLinuxResolvConfFile; then
+            echo 'prepend_nameservers=127.0.0.1' >> $archLinuxResolvConfFile
+        fi
+        if ! grep -q 'local_nameservers' $archLinuxResolvConfFile; then
+            echo 'local_nameservers="0.0.0.0 255.255.255.255 ::1"' >> $archLinuxResolvConfFile
         fi
         resolvconf -u
     fi
@@ -193,8 +202,13 @@ function cleanupDNSDarwin {
 
 function cleanupCustomDNSLinux {
     resolvConfHeadFile=/etc/resolvconf/resolv.conf.d/head
+    archLinuxResolvConfFile=/etc/resolvconf.conf
     if [ -f $resolvConfHeadFile ]; then
         sed -i '/nameserver 127.0.0.1/d' $resolvConfHeadFile
+        resolvconf -u
+    elif [ -f $archLinuxResolvConfFile ]; then
+        sed -i '/prepend_nameservers=127.0.0.1/d' $archLinuxResolvConfFile
+        sed -i '/local_nameservers/d' $archLinuxResolvConfFile
         resolvconf -u
     fi
 }
