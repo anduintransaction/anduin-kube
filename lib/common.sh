@@ -31,9 +31,9 @@ function copyToUsrLocalBin {
     if [ $? -ne 0 ]; then
         currentUser=`getCurrentUser`
         currentGroup=`getCurrentUserGroup`
-        sudo cp $fileToCopy /usr/local/bin
-        sudo chmod 755 /usr/local/bin/`basename $fileToCopy`
-        sudo chown $currentUser:$currentGroup /usr/local/bin/`basename $fileToCopy`
+        sudo -E cp $fileToCopy /usr/local/bin
+        sudo -E chmod 755 /usr/local/bin/`basename $fileToCopy`
+        sudo -E chown $currentUser:$currentGroup /usr/local/bin/`basename $fileToCopy`
     else
         cp $fileToCopy /usr/local/bin
         rm /usr/local/bin/$filename

@@ -2,5 +2,5 @@
 
 function forceStop {
     VBoxManage controlvm minikube poweroff
-    sudo anduin-kube cleanup
+    sudo -E anduin-kube cleanup
 }

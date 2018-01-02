@@ -4,12 +4,12 @@ function stop {
     stt=`minikubeStatus`
     case $stt in
         stopped)
-            sudo anduin-kube cleanup
+            sudo -E anduin-kube cleanup
             exit 0
             ;;
         *)
             minikube stop
-            sudo anduin-kube cleanup
+            sudo -E anduin-kube cleanup
             ;;
     esac
 }

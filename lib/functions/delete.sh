@@ -18,6 +18,6 @@ function cleanupVBox {
 function delete {
     removeMinikube && \
         cleanupVBox && \
-        sudo anduin-kube cleanup && \
-        sudo rm -rvf ~/.minikube
+        sudo -E anduin-kube cleanup && \
+        sudo -E rm -rvf ~/.minikube
 }

@@ -14,5 +14,5 @@ function fix {
             iptableSuccess=1
         fi
     done
-    sudo anduin-kube setup-network
+    sudo -E anduin-kube setup-network
 }
