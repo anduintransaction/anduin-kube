@@ -150,10 +150,10 @@ function modifyRouteDarwin {
 }
 
 function modifyRouteLinux {
-    if ! route -n | grep -q '10.96.0.0'; then
+    if ! ip route | grep -q '10.96.0.0/12'; then
         ip route add 10.96.0.0/12 via $MINIKUBE_IP
     fi
-    if ! route -n | grep -q '172.17.0.0'; then
+    if ! ip route | grep -q '172.17.0.0/24'; then
         ip route add 172.17.0.0/24 via $MINIKUBE_IP
     fi
 }
