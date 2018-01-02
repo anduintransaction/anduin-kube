@@ -229,10 +229,10 @@ function cleanupRouteDarwin {
 }
 
 function cleanupRouteLinux {
-    if route -n | grep -q '10.96.0.0'; then
+    if ip route | grep -q '10.96.0.0/12'; then
         ip route del 10.96.0.0/12
     fi
-    if route -n | grep -q '172.17.0.0'; then
+    if ip route | grep -q '172.17.0.0/24'; then
         ip route del 172.17.0.0/24
     fi
 }
