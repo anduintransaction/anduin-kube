@@ -253,6 +253,12 @@ function cleanupRoute {
 }
 
 function installCoreDNS {
+    # Waiting for network
+    echo "Waiting for network"
+    until curl -sS -o /dev/null --fail -m 5 https://github.com; do
+        echo .
+        sleep 3
+    done
     needInstall=0
     if ! which coredns > /dev/null 2>&1; then
         needInstall=1
