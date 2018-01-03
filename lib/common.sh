@@ -269,7 +269,7 @@ function cleanupRoute {
 function installCoreDNS {
     # Waiting for network
     echo "Waiting for network"
-    until curl -sS -o /dev/null --fail -m 5 https://github.com; do
+    until curl -sS -o /dev/null --fail -m 5 https://github.com 2>/dev/null; do
         echo .
         sleep 3
     done
