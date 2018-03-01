@@ -2,7 +2,7 @@
 
 function checkDeps {
     if ! which VBoxManage > /dev/null 2>&1; then
-        echo "VirtualBox not found. Please install Docker Toolbox: https://www.docker.com/products/docker-toolbox"
+        echo "VirtualBox not found. Please install VirtualBox: https://www.virtualbox.org/wiki/Downloads"
         return 1
     fi
     case `uname` in
