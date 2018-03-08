@@ -120,6 +120,12 @@ function addCustomDNSLinux {
             echo 'local_nameservers="0.0.0.0 255.255.255.255 ::1"' >> $archLinuxResolvConfFile
         fi
         resolvconf -u
+    elif [ -f "/run/systemd/resolve/stub-resolv.conf" ]; then
+        devices=`nmcli -c no -f UUID con | grep -v UUID`
+        for device in `echo "$devices"`; do
+            nmcli con mod $device ipv4.dns "127.0.0.1 8.8.8.8"
+        done
+        systemctl restart NetworkManager
     fi
 }
 
@@ -210,6 +216,18 @@ function cleanupCustomDNSLinux {
         sed -i '/prepend_nameservers=127.0.0.1/d' $archLinuxResolvConfFile
         sed -i '/local_nameservers/d' $archLinuxResolvConfFile
         resolvconf -u
+    elif [ -f "/run/systemd/resolve/stub-resolv.conf" ]; then
+         systemctl disable systemd-resolved
+         systemctl stop systemd-resolved
+         rm -f /etc/resolv.conf
+         if ! grep -q 'dns=default' /etc/NetworkManager/NetworkManager.conf; then
+             sed -i "s/\[main\]/[main]\ndns=default/" /etc/NetworkManager/NetworkManager.conf
+         fi
+         devices=`nmcli -c no -f UUID con | grep -v UUID`
+         for device in `echo "$devices"`; do
+             nmcli con mod $device ipv4.dns "8.8.8.8"
+         done
+         systemctl restart NetworkManager
     fi
 }
 
