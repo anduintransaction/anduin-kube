@@ -126,6 +126,13 @@ function addCustomDNSLinux {
             nmcli con mod $device ipv4.dns "127.0.0.1 8.8.8.8"
         done
         systemctl restart NetworkManager
+    else
+        echo "[main]" > /etc/NetworkManager/conf.d/anduin-kube.conf
+        echo "dns=none" >> /etc/NetworkManager/conf.d/anduin-kube.conf
+        rm -f /etc/resolv.conf
+        systemctl restart NetworkManager
+        echo "nameserver 127.0.0.1" > /etc/resolv.conf
+        echo "nameserver 8.8.8.8" >> /etc/resolv.conf 
     fi
 }
 
@@ -228,6 +235,9 @@ function cleanupCustomDNSLinux {
              nmcli con mod $device ipv4.dns "8.8.8.8"
          done
          systemctl restart NetworkManager
+    else
+        rm -f /etc/NetworkManager/conf.d/anduin-kube.conf
+        systemctl restart NetworkManager
     fi
 }
 
