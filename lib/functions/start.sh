@@ -23,7 +23,8 @@ function startMinikube {
         VBoxManage modifyvm minikube --nic1 nat && \
         VBoxManage modifyvm minikube --natnet1 "192.168.171/24" && \
         VBoxManage modifyvm minikube --natdnshostresolver1 on && \
-        minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION --bootstrapper=kubeadm
+        minikube start --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION --bootstrapper=kubeadm && \
+        minikube addons enable dashboard
 }
 
 function waitForKubernetes {
