@@ -46,7 +46,7 @@ function echoLog {
 }
 
 function minikubeStatus {
-    case $(minikube status | grep 'minikube: ' | sed 's/minikube: //') in
+    case $(minikube status | grep 'host: ' | sed 's/host: //') in
         Running)
             echo "started"
             ;;
