@@ -5,5 +5,5 @@ function setupNetwork {
         echo "Must be root"
         exit 1
     fi
-    cleanupDNS && cleanupRoute && modifyDNS && modifyRoute && startCoreDNS && startHealthz
+    cleanupRoute && modifyRoute && startHealthz
 }
