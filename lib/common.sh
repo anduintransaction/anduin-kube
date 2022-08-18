@@ -81,11 +81,11 @@ function deleteVBoxNetwork {
 }
 
 function copyFileToMinikube {
-    scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.minikube/machines/minikube/id_rsa -r $1 docker@$MINIKUBE_IP:$2
+    scp -q -o ConnectTimeout=30 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.minikube/machines/minikube/id_rsa -r $1 docker@$MINIKUBE_IP:$2
 }
 
 function runCommandOnMinikube {
-    ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.minikube/machines/minikube/id_rsa docker@$MINIKUBE_IP $@
+    ssh -q -o ConnectTimeout=30 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.minikube/machines/minikube/id_rsa docker@$MINIKUBE_IP $@
 }
 
 function modifyDNSDarwin {
