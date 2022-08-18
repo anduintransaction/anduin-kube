@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-export MINIKUBE_VERSION=v1.2.0
-export MINIKUBE_ISO_VERSION=v1.2.0
+export MINIKUBE_VERSION=v1.26.1
+export MINIKUBE_ISO_VERSION=v1.26.1
 export MINIKUBE_CIDR=192.168.144.1
 export MINIKUBE_DHCP_IP=192.168.144.6
 export MINIKUBE_IP=192.168.144.100
 export MINIKUBE_CPU=4
 export MINIKUBE_RAM=${MINIKUBE_RAM:-6144}
 export MINIKUBE_DISK_SIZE=50g
-export KUBERNETES_VERSION=v1.15.0
-export KUBERNETES_MINIKUBE_VERSION=v1.15.0
+export KUBERNETES_VERSION=v1.22.6
+export KUBERNETES_MINIKUBE_VERSION=v1.22.6
 export DOCKER_VERSION=18.09.6
 export IMLADRIS_VERSION=0.13.1
 export COREDNS_VERSION=1.5.2
@@ -132,7 +132,7 @@ function addCustomDNSLinux {
         rm -f /etc/resolv.conf
         systemctl restart NetworkManager
         echo "nameserver 127.0.0.1" > /etc/resolv.conf
-        echo "nameserver 8.8.8.8" >> /etc/resolv.conf 
+        echo "nameserver 8.8.8.8" >> /etc/resolv.conf
     fi
 }
 
