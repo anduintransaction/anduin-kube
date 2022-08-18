@@ -66,6 +66,9 @@ case $1 in
     time-sync)
         timeSync
         ;;
+    fix-kube-ip)
+        fixKubeIP
+        ;;
     *)
         minikube $@
         ;;
