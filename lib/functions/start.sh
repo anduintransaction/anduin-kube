@@ -12,6 +12,7 @@ function createNetwork {
 
 function startMinikube {
     minikube start \
+             --driver=virtualbox \
              --kubernetes-version=$KUBERNETES_MINIKUBE_VERSION \
              --bootstrapper=kubeadm \
              --cpus=$MINIKUBE_CPU \
