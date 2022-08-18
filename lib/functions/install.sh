@@ -16,7 +16,7 @@ function checkDeps {
 
 function installMinikube {
     if which minikube > /dev/null 2>&1; then
-        version=`minikube version`
+        version=`minikube version | head -1`
         if [ "$version" == "minikube version: $MINIKUBE_VERSION" ]; then
             return
         fi
