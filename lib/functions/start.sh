@@ -30,7 +30,7 @@ function startMinikube {
 function waitForKubernetes {
     echo "Waiting for kubernetes to come online"
     count=0
-    until curl -sS -m 10 -f -o /dev/null --head http://kubernetes-dashboard.kube-system.svc.kube 2>/dev/null; do
+    until curl -sS -m 10 -f -o /dev/null --head http://kubernetes-dashboard.kubernetes-dashboard.svc.kube 2>/dev/null; do
         printf .
         count=`expr $count + 1`
         sudo -E anduin-kube clear-cache
