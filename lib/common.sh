@@ -90,14 +90,7 @@ function runCommandOnMinikube {
 
 function modifyDNSDarwin {
     networksetup -listallnetworkservices | grep -v '\*' | while read line; do
-        currentNS=`networksetup -getdnsservers "$line"`
-        if [[ $currentNS == There* ]]; then
-            currentNS=8.8.8.8
-        fi
-        if [[ $currentNS != *127.0.0.1* ]]; then
-            currentNS="127.0.0.1 $currentNS"
-            networksetup -setdnsservers "$line" $currentNS
-        fi
+        networksetup -setdnsservers "$line" 127.0.0.1
     done
     launchctl unload /System/Library/LaunchDaemons/com.apple.mDNSResponder.plist
     defaults write /Library/Preferences/com.apple.mDNSResponder.plist StrictUnicastOrdering -bool YES
@@ -200,7 +193,7 @@ function cleanupDNSDarwin {
         currentNS=`networksetup -getdnsservers "$line"`
         if [[ $currentNS != There* ]] && [[ $currentNS == *$MINIKUBE_IP* ]] || [[ $currentNS == *127.0.0.1* ]]; then
             currentNS=`echo $currentNS | sed 's/'$MINIKUBE_IP'//g' | sed 's/\s*//'`
-            currentNS=`echo $currentNS | sed 's/127.0.0.1//g' | sed 's/\s*//'`
+            currentNS=`echo $currentNS | sed 's/127.0.0.1/8.8.8.8/g' | sed 's/\s*//'`
             networksetup -setdnsservers "$line" $currentNS
         fi
         currentSearch=`networksetup -getsearchdomains "$line"`

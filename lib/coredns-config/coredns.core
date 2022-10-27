@@ -14,6 +14,7 @@ kube:53, kube-local.io:53 {
      auto {
          directory __HOME__/.anduin-kube/zones
      }
+     forward . 8.8.8.8
      log stdout {
          class all
      }
