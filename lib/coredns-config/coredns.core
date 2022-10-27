@@ -1,7 +1,6 @@
 kube:53, kube-local.io:53 {
      rewrite type ANY A
      kubernetes kube kube-local.io {
-                resyncperiod 60s
                 endpoint https://192.168.144.100:8443
                 tls __HOME__/.minikube/profiles/minikube/apiserver.crt __HOME__/.minikube/profiles/minikube/apiserver.key __HOME__/.minikube/ca.crt
      }
